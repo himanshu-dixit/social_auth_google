@@ -5,23 +5,38 @@ namespace Drupal\social_auth_google\Settings;
 use Drupal\social_api\Settings\SettingsBase;
 
 /**
- * Returns the client information.
+ * Defines methods to get Social Auth Facebook app settings.
  */
 class GoogleAuthSettings extends SettingsBase implements GoogleAuthSettingsInterface {
 
   /**
-   * Client ID.
+   * Application ID.
    *
    * @var string
    */
   protected $clientId;
 
   /**
-   * Client secret.
+   * Application secret.
    *
    * @var string
    */
   protected $clientSecret;
+
+
+  /**
+   * The default access token.
+   *
+   * @var string
+   */
+  protected $defaultToken;
+
+  /**
+   * The redirect URL for social_auth implmeneter.
+   *
+   * @var string
+   */
+  protected $oauthRedirectUrl;
 
   /**
    * {@inheritdoc}
@@ -42,5 +57,6 @@ class GoogleAuthSettings extends SettingsBase implements GoogleAuthSettingsInter
     }
     return $this->clientSecret;
   }
+
 
 }
