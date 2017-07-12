@@ -1,0 +1,14 @@
+services:
+  social_auth_google.manager:
+    class: Drupal\social_auth_google\GoogleAuthManager
+    arguments:
+      - '@logger.factory'
+      - '@event_dispatcher'
+      - '@entity_field.manager'
+      - '@url_generator.non_bubbling'
+      - '@social_auth_google.persistent_data_handler'
+
+  social_auth_google.persistent_data_handler:
+    class: Drupal\social_auth_google\GoogleAuthPersistentDataHandler
+    arguments:
+      - '@session'
