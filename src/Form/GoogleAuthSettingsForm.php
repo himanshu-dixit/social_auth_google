@@ -99,7 +99,6 @@ class GoogleAuthSettingsForm extends SocialAuthSettingsForm {
       '#description' => $this->t('Copy the Client Secret here.'),
     ];
 
-
     $form['google_settings']['data_points'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Data Points to be Collected'),
@@ -125,8 +124,6 @@ class GoogleAuthSettingsForm extends SocialAuthSettingsForm {
 
     return parent::buildForm($form, $form_state);
   }
-
-
 
   /**
    * {@inheritdoc}

@@ -23,5 +23,4 @@ interface GoogleAuthSettingsInterface {
    */
   public function getClientSecret();
 
-
 }

@@ -74,10 +74,10 @@ class GoogleAuthManager extends OAuth2Manager {
    *   Used for generating absoulute URLs.
    */
   public function __construct(LoggerChannelFactoryInterface $logger_factory, EventDispatcherInterface $event_dispatcher, EntityFieldManagerInterface $entity_field_manager, UrlGeneratorInterface $url_generator) {
-    $this->loggerFactory         = $logger_factory;
-    $this->eventDispatcher       = $event_dispatcher;
-    $this->entityFieldManager    = $entity_field_manager;
-    $this->urlGenerator          = $url_generator;
+    $this->loggerFactory      = $logger_factory;
+    $this->eventDispatcher    = $event_dispatcher;
+    $this->entityFieldManager = $entity_field_manager;
+    $this->urlGenerator       = $url_generator;
   }
 
   /**
@@ -127,7 +127,7 @@ class GoogleAuthManager extends OAuth2Manager {
   protected function checkForScopes($data_points) {
     $scopes = [];
 
-    //Scopes required for data point.
+    // Scopes required for data point.
     $scopeForDataPoint = [
       "name"   => '',
       "email"  => '',

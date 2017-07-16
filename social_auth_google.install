@@ -11,7 +11,7 @@ use Drupal\social_auth\Controller\SocialAuthController;
 /**
  * Implements hook_requirements().
  *
- * Checks that a compatible version of oAuth2 Facebook library for the
+ * Checks that a compatible version of oAuth2 Google library for the
  * leagueoAuthclient with Composer. Check installation instructions
  * from the README.txt.
  */

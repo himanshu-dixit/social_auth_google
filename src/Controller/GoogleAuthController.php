@@ -78,7 +78,7 @@ class GoogleAuthController extends ControllerBase {
    *   Used to manage authentication methods.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request
    *   Used to access GET parameters.
-   * @param \Drupal\social_auth\SocialAuthDataHandler $data_handler
+   * @param \Drupal\social_auth\SocialAuthDataHandler $social_auth_data_handler
    *   SocialAuthDataHandler object.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    *   Used for logging errors.
@@ -99,7 +99,7 @@ class GoogleAuthController extends ControllerBase {
     $this->dataHandler->getSessionPrefix('social_auth_google');
 
     // Sets the session keys to nullify if user could not logged in.
-    $this->userManager->setSessionKeysToNullify(['access_token',]);
+    $this->userManager->setSessionKeysToNullify(['access_token']);
     $this->setting = $this->config('social_auth_google.settings');
   }
 
@@ -177,12 +177,11 @@ class GoogleAuthController extends ControllerBase {
       drupal_set_message($this->t('Google login failed. Probably User Declined Authentication.'), 'error');
       return $this->redirect('user.login');
     }
-    else if (empty($_GET['state']) || ($_GET['state'] !== $state)) {
+    elseif (empty($_GET['state']) || ($_GET['state'] !== $state)) {
       unset($_SESSION['oauth2state']);
       drupal_set_message($this->t('Google login failed. Unvalid oAuth2 State.'), 'error');
       return $this->redirect('user.login');
     }
-
 
     $this->googleManager->setClient($google)->authenticate();
 

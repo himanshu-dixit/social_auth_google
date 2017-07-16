@@ -116,7 +116,7 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
         'clientId'          => $settings->getClientId(),
         'clientSecret'      => $settings->getClientSecret(),
         'redirectUri'       => $GLOBALS['base_url'] . '/user/login/google/callback',
-        'accessType'   => 'offline'
+        'accessType'   => 'offline',
       ];
 
       return new Google($league_settings);
@@ -137,7 +137,7 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
   protected function validateConfig(GoogleAuthSettings $settings) {
     $client_id = $settings->getClientId();
     $client_secret = $settings->getClientSecret();
-    if (!$client_id || !$client_secret ) {
+    if (!$client_id || !$client_secret) {
       $this->loggerFactory
         ->get('social_auth_google')
         ->error('Define Client ID and Client Secret on module settings.');
