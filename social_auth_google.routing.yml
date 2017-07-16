@@ -7,10 +7,10 @@ social_auth_google.redirect_to_google:
   options:
     no_cache: TRUE
 
-social_auth_google.return_from_google:
+social_auth_google.callback:
   path: 'user/login/google/callback'
   defaults:
-    _controller: '\Drupal\social_auth_google\Controller\GoogleAuthController::returnFromGoogle'
+    _controller: '\Drupal\social_auth_google\Controller\GoogleAuthController::callback'
   requirements:
     _role: 'anonymous'
   options:

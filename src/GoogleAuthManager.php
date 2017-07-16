@@ -9,7 +9,7 @@ use Drupal\Core\Routing\UrlGeneratorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Contains all Simple FB Connect logic that is related to Google interaction.
+ * Contains all the logic for Google login integration.
  */
 class GoogleAuthManager extends OAuth2Manager {
 
@@ -42,29 +42,22 @@ class GoogleAuthManager extends OAuth2Manager {
   protected $urlGenerator;
 
   /**
-   * The Google persistent data handler.
-   *
-   * @var \Drupal\social_auth_google\GoogleAuthPersistentDataHandler
-   */
-  protected $persistentDataHandler;
-
-  /**
    * The Google client object.
    *
-   * @var \Google\Google
+   * @var \League\OAuth2\Client\Provider\Google
    */
   protected $client;
   /**
    * The Google access token.
    *
-   * @var \Google\Google
+   * @var \League\OAuth2\Client\Provider\Google
    */
   protected $token;
 
   /**
    * The Google access token.
    *
-   * @var \Google\Google
+   * @var \League\OAuth2\Client\Provider\Google
    */
   protected $user;
 
@@ -79,15 +72,12 @@ class GoogleAuthManager extends OAuth2Manager {
    *   Used for accessing Drupal user picture preferences.
    * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
    *   Used for generating absoulute URLs.
-   * @param \Drupal\social_auth_google\GoogleAuthPersistentDataHandler $persistent_data_handler
-   *   Used for reading data from and writing data to session.
    */
-  public function __construct(LoggerChannelFactoryInterface $logger_factory, EventDispatcherInterface $event_dispatcher, EntityFieldManagerInterface $entity_field_manager, UrlGeneratorInterface $url_generator, GoogleAuthPersistentDataHandler $persistent_data_handler) {
+  public function __construct(LoggerChannelFactoryInterface $logger_factory, EventDispatcherInterface $event_dispatcher, EntityFieldManagerInterface $entity_field_manager, UrlGeneratorInterface $url_generator) {
     $this->loggerFactory         = $logger_factory;
     $this->eventDispatcher       = $event_dispatcher;
     $this->entityFieldManager    = $entity_field_manager;
     $this->urlGenerator          = $url_generator;
-    $this->persistentDataHandler = $persistent_data_handler;
   }
 
   /**
@@ -107,7 +97,7 @@ class GoogleAuthManager extends OAuth2Manager {
    * Gets the data by using the access token returned.
    *
    * @return array
-   *   User Info returned by the google.
+   *   User info returned by the Google.
    */
   public function getUserInfo() {
     $this->user = $this->client->getResourceOwner($this->token);
@@ -120,11 +110,38 @@ class GoogleAuthManager extends OAuth2Manager {
    * @return string
    *   Absolute Google login URL where user will be redirected
    */
-  public function getGoogleLoginUrl() {
-    $login_url = $this->client->getAuthorizationUrl();
+  public function getGoogleLoginUrl($data_points) {
+    $scopes = $this->checkForScopes($data_points);
+    $login_url = $this->client->getAuthorizationUrl($scopes);
 
     // Generate and return the URL where we should redirect the user.
     return $login_url;
+  }
+
+  /**
+   * Returns scopes required for data point defined by administator.
+   *
+   * @return array
+   *   scopes for authorization URL.
+   */
+  protected function checkForScopes($data_points) {
+    $scopes = [];
+
+    //Scopes required for data point.
+    $scopeForDataPoint = [
+      "name"   => '',
+      "email"  => '',
+    ];
+
+    foreach ($data_points as $data_point) {
+      $scope = $scopeForDataPoint[$data_point];
+      // If scope is not in array, then add it.
+      if (!in_array($scope, $scopes)) {
+        array_push($scopes, $scope);
+      }
+    }
+
+    return $scopes;
   }
 
   /**

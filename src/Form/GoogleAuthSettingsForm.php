@@ -78,7 +78,7 @@ class GoogleAuthSettingsForm extends SocialAuthSettingsForm {
 
     $form['google_settings'] = [
       '#type' => 'details',
-      '#title' => $this->t('Google App settings'),
+      '#title' => $this->t('Google Client settings'),
       '#open' => TRUE,
       '#description' => $this->t('You need to first create a Google App at <a href="@google-dev">@google-dev</a>', ['@google-dev' => 'https://developers.google.com/apps']),
     ];
@@ -88,7 +88,7 @@ class GoogleAuthSettingsForm extends SocialAuthSettingsForm {
       '#required' => TRUE,
       '#title' => $this->t('Client ID'),
       '#default_value' => $config->get('client_id'),
-      '#description' => $this->t('Copy the Client ID of your Google App here. This value can be found from your App Dashboard.'),
+      '#description' => $this->t('Copy the Client ID here.'),
     ];
 
     $form['google_settings']['client_secret'] = [
@@ -96,39 +96,31 @@ class GoogleAuthSettingsForm extends SocialAuthSettingsForm {
       '#required' => TRUE,
       '#title' => $this->t('Client Secret'),
       '#default_value' => $config->get('client_secret'),
-      '#description' => $this->t('Copy the Client Secret of your Google App here. This value can be found from your App Dashboard.'),
+      '#description' => $this->t('Copy the Client Secret here.'),
     ];
 
 
     $form['google_settings']['data_points'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Data Points To Be Collected'),
+      '#title' => $this->t('Data Points to be Collected'),
       '#default_value' => 'name,email',
       '#description' => $this->t('Define the data point to be stored in database, data points must be separated by comma.'),
     ];
 
-    $form['google_settings']['oauth_redirect_url'] = [
+    $form['google_settings']['authorized_redirect_url'] = [
       '#type' => 'textfield',
       '#disabled' => TRUE,
-      '#title' => $this->t('Valid OAuth redirect URIs'),
-      '#description' => $this->t('Copy this value to <em>Valid OAuth redirect URIs</em> field of your Google App settings.'),
+      '#title' => $this->t('Authorized redirect URIs'),
+      '#description' => $this->t('Copy this value to <em>Authorized redirect URIs</em> field of your Google App settings.'),
       '#default_value' => $GLOBALS['base_url'] . '/user/login/google/callback',
     ];
 
-    $form['google_settings']['app_domains'] = [
+    $form['google_settings']['authorized_javascript_origin'] = [
       '#type' => 'textfield',
       '#disabled' => TRUE,
-      '#title' => $this->t('App Domains'),
-      '#description' => $this->t('Copy this value to <em>App Domains</em> field of your Google App settings.'),
+      '#title' => $this->t('Authorized Javascript Origin'),
+      '#description' => $this->t('Copy this value to <em>Authorized Javascript Origins</em> field of your Google App settings.'),
       '#default_value' => $this->requestContext->getHost(),
-    ];
-
-    $form['google_settings']['site_url'] = [
-      '#type' => 'textfield',
-      '#disabled' => TRUE,
-      '#title' => $this->t('Site URL'),
-      '#description' => $this->t('Copy this value to <em>Site URL</em> field of your Google App settings.'),
-      '#default_value' => $GLOBALS['base_url'],
     ];
 
     return parent::buildForm($form, $form_state);

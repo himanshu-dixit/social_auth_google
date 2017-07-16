@@ -4,12 +4,12 @@ namespace Drupal\social_auth_google\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\social_api\Plugin\NetworkManager;
+use Drupal\social_auth\SocialAuthDataHandler;
 use Drupal\social_auth\SocialAuthUserManager;
 use Drupal\social_auth_google\GoogleAuthManager;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
-use Drupal\social_auth_google\GoogleAuthPersistentDataHandler;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 
@@ -33,9 +33,9 @@ class GoogleAuthController extends ControllerBase {
   private $userManager;
 
   /**
-   * The Facebook authentication manager.
+   * The google authentication manager.
    *
-   * @var \Drupal\social_auth_facebook\FacebookAuthManager
+   * @var \Drupal\social_auth_google\GoogleAuthManager
    */
   private $googleManager;
 
@@ -47,11 +47,11 @@ class GoogleAuthController extends ControllerBase {
   private $request;
 
   /**
-   * The Facebook Persistent Data Handler.
+   * The Social Auth Data Handler.
    *
-   * @var \Drupal\social_auth_facebook\FacebookAuthPersistentDataHandler
+   * @var \Drupal\social_auth\SocialAuthDataHandler
    */
-  private $persistentDataHandler;
+  private $dataHandler;
 
   /**
    * The data point to be collected.
@@ -71,34 +71,35 @@ class GoogleAuthController extends ControllerBase {
    * GoogleAuthController constructor.
    *
    * @param \Drupal\social_api\Plugin\NetworkManager $network_manager
-   *   Used to get an instance of social_auth_facebook network plugin.
+   *   Used to get an instance of social_auth_google network plugin.
    * @param \Drupal\social_auth\SocialAuthUserManager $user_manager
    *   Manages user login/registration.
-   * @param \Drupal\social_auth_facebook\FacebookAuthManager $facebook_manager
+   * @param \Drupal\social_auth_google\GoogleAuthManager $google_manager
    *   Used to manage authentication methods.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request
    *   Used to access GET parameters.
-   * @param \Drupal\social_auth_facebook\FacebookAuthPersistentDataHandler $persistent_data_handler
-   *   FacebookAuthPersistentDataHandler object.
+   * @param \Drupal\social_auth\SocialAuthDataHandler $data_handler
+   *   SocialAuthDataHandler object.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    *   Used for logging errors.
    */
-  public function __construct(NetworkManager $network_manager, SocialAuthUserManager $user_manager, GoogleAuthManager $google_manager, RequestStack $request, GoogleAuthPersistentDataHandler $persistent_data_handler, LoggerChannelFactoryInterface $logger_factory) {
+  public function __construct(NetworkManager $network_manager, SocialAuthUserManager $user_manager, GoogleAuthManager $google_manager, RequestStack $request, SocialAuthDataHandler $social_auth_data_handler, LoggerChannelFactoryInterface $logger_factory) {
 
     $this->networkManager = $network_manager;
     $this->userManager = $user_manager;
     $this->googleManager = $google_manager;
     $this->request = $request;
-    $this->persistentDataHandler = $persistent_data_handler;
+    $this->dataHandler = $social_auth_data_handler;
     $this->loggerFactory = $logger_factory;
 
     // Sets the plugin id.
     $this->userManager->setPluginId('social_auth_google');
 
+    // Sets session prefix for data handler.
+    $this->dataHandler->getSessionPrefix('social_auth_google');
+
     // Sets the session keys to nullify if user could not logged in.
-    $this->userManager->setSessionKeysToNullify([
-      $this->persistentDataHandler->getSessionPrefix() . 'access_token',
-    ]);
+    $this->userManager->setSessionKeysToNullify(['access_token',]);
     $this->setting = $this->config('social_auth_google.settings');
   }
 
@@ -111,7 +112,7 @@ class GoogleAuthController extends ControllerBase {
       $container->get('social_auth.user_manager'),
       $container->get('social_auth_google.manager'),
       $container->get('request_stack'),
-      $container->get('social_auth_google.persistent_data_handler'),
+      $container->get('social_auth.social_auth_data_handler'),
       $container->get('logger.factory')
     );
   }
@@ -134,14 +135,16 @@ class GoogleAuthController extends ControllerBase {
     // Google service was returned, inject it to $googleManager.
     $this->googleManager->setClient($google);
 
+    $data_points = explode(',', $this->getDataPoints());
+
     // Generates the URL where the user will be redirected for Google login.
     // If the user did not have email permission granted on previous attempt,
     // we use the re-request URL requesting only the email address.
-    $google_login_url = $this->googleManager->getGoogleLoginUrl();
+    $google_login_url = $this->googleManager->getGoogleLoginUrl($data_points);
 
     $state = $this->googleManager->getState();
 
-    $this->persistentDataHandler->set('oAuth2State', $state);
+    $this->dataHandler->set('oAuth2State', $state);
 
     return new TrustedRedirectResponse($google_login_url);
   }
@@ -151,7 +154,7 @@ class GoogleAuthController extends ControllerBase {
    *
    * Google returns the user here after user has authenticated in Google.
    */
-  public function returnFromGoogle() {
+  public function callback() {
     // Checks if user cancel login via Google.
     $error = $this->request->getCurrentRequest()->get('error');
     if ($error == 'access_denied') {
@@ -168,7 +171,7 @@ class GoogleAuthController extends ControllerBase {
       return $this->redirect('user.login');
     }
 
-    $state = $this->persistentDataHandler->get('oAuth2State');
+    $state = $this->dataHandler->get('oAuth2State');
 
     if (!empty($_GET['error'])) {
       drupal_set_message($this->t('Google login failed. Probably User Declined Authentication.'), 'error');
@@ -189,7 +192,6 @@ class GoogleAuthController extends ControllerBase {
       return $this->redirect('user.login');
     }
 
-
     $data = [];
 
     $data_points = explode(',', $this->getDataPoints());
@@ -202,8 +204,8 @@ class GoogleAuthController extends ControllerBase {
     }
 
     // Saves access token to session.
-    $this->persistentDataHandler->set('access_token', $this->googleManager->getAccessToken());
-    var_dump($google_profile);
+    $this->dataHandler->set('access_token', $this->googleManager->getAccessToken());
+
     // If user information could be retrieved.
     return $this->userManager->authenticateUser($google_profile->getName(), $google_profile->getEmail(), 'social_auth_google', $google_profile->getId(), $google_profile->getAvatar(), json_encode($data));
   }

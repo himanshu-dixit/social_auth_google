@@ -4,10 +4,7 @@ social_auth_google.settings:
   mapping:
     app_id:
       type: string
-      label: 'Application ID'
+      label: 'Client ID'
     app_secret:
       type: string
-      label: 'App Secret'
-    graph_version:
-      type: float
-      label: 'Google Graph API version'
+      label: 'Client Secret'
