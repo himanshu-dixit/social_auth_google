@@ -15,7 +15,7 @@ use League\OAuth2\Client\Provider\Google;
 /**
  * Defines a Network Plugin for Social Auth Google.
  *
- * @package Drupal\simple_fb_connect\Plugin\Network
+ * @package Drupal\simple_google_connect\Plugin\Network
  *
  * @Network(
  *   id = "social_auth_google",
