@@ -109,14 +109,18 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
     }
     /* @var \Drupal\social_auth_google\Settings\GoogleAuthSettings $settings */
     $settings = $this->settings;
-
+    //check for proxy if it exist, pass ad league setting parameter.
+    if ($proxyPass) {
+      $proxyUrl = 'http://' . $proxyUser . ':' . $proxyPass . '@' . $proxyAddress . ':' . $proxyPort;
+    }
     if ($this->validateConfig($settings)) {
       // All these settings are mandatory.
       $league_settings = [
         'clientId'          => $settings->getClientId(),
         'clientSecret'      => $settings->getClientSecret(),
         'redirectUri'       => $GLOBALS['base_url'] . '/user/login/google/callback',
-        'accessType'   => 'offline',
+        'accessType'        => 'offline',
+        'verify'            => false,
       ];
 
       return new Google($league_settings);

@@ -178,7 +178,7 @@ class GoogleAuthController extends ControllerBase {
       return $this->redirect('user.login');
     }
     elseif (empty($_GET['state']) || ($_GET['state'] !== $state)) {
-      unset($_SESSION['oauth2state']);
+      $this->userManager->setSessionKeysToNullify(['oauth2state']);
       drupal_set_message($this->t('Google login failed. Unvalid oAuth2 State.'), 'error');
       return $this->redirect('user.login');
     }

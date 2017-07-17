@@ -12,7 +12,7 @@ use Drupal\social_auth\Controller\SocialAuthController;
  * Implements hook_requirements().
  *
  * Checks that a compatible version of oAuth2 Google library for the
- * leagueoAuthclient with Composer. Check installation instructions
+ * league OAuth2 client with Composer. Check installation instructions
  * from the README.txt.
  */
 function social_auth_google_requirements($phase) {
