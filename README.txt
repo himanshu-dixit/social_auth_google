@@ -48,10 +48,10 @@ INSTALLATION
 CONFIGURATION
 -------------
 
- * Add your Twitter project OAuth information in
-   Configuration » User Authentication » Twitter.
+ * Add your Google project OAuth information in
+   Configuration » User Authentication » Google.
 
- * Place a Social Auth Twitter block in Structure » Block Layout.
+ * Place a Social Auth Google block in Structure » Block Layout.
 
  * If you already have a Social Auth Login block in the site, rebuild the cache.
 
@@ -59,15 +59,15 @@ CONFIGURATION
 HOW IT WORKS
 ------------
 
-User can click on the Twitter logo on the Social Auth Login block
+User can click on the Google logo on the Social Auth Login block
 You can also add a button or link anywhere on the site that points
-to /user/login/twitter, so theming and customizing the button or link
+to /user/login/google, so theming and customizing the button or link
 is very flexible.
 
-When the user opens the /user/login/twitter link, it automatically takes
-user to Twitter Accounts for authentication. Twitter then returns the user to
+When the user opens the /user/login/google link, it automatically takes
+user to Google Accounts for authentication. Google then returns the user to
 Drupal site. If we have an existing Drupal user with the same email address
-provided by Twitter, that user is logged in. Otherwise a new Drupal user is
+provided by Google, that user is logged in. Otherwise a new Drupal user is
 created.
 
 SUPPORT REQUESTS
@@ -77,8 +77,8 @@ Before posting a support request, carefully read the installation
 instructions provided in module documentation page.
 
 Before posting a support request, check Composer Manager status report at
-admin/reports/composer-manager. This status page will show the TwitterOAuth PHP
-library version if Drupal can detect it.
+admin/reports/composer-manager. This status page will show the Google The League OAuth2 Base
+PHP library version if Drupal can detect it.
 
 Before posting a support request, check Recent log entries at
 admin/reports/dblog
