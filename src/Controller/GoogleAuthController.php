@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 
 /**
- * Returns responses for Simple FB Connect module routes.
+ * Returns responses for Simple Google Connect module routes.
  */
 class GoogleAuthController extends ControllerBase {
 
@@ -185,7 +185,7 @@ class GoogleAuthController extends ControllerBase {
 
     $this->googleManager->setClient($google)->authenticate();
 
-    // Gets user's FB profile from Google API.
+    // Gets user's info from Google API.
     if (!$google_profile = $this->googleManager->getUserInfo()) {
       drupal_set_message($this->t('Google login failed, could not load Google profile. Contact site administrator.'), 'error');
       return $this->redirect('user.login');
