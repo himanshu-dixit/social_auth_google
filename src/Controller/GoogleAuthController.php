@@ -173,11 +173,9 @@ class GoogleAuthController extends ControllerBase {
 
     $state = $this->dataHandler->get('oAuth2State');
 
-    if (!empty($_GET['error'])) {
-      drupal_set_message($this->t('Google login failed. Probably User Declined Authentication.'), 'error');
-      return $this->redirect('user.login');
-    }
-    elseif (empty($_GET['state']) || ($_GET['state'] !== $state)) {
+    // Retreives $_GET['state'].
+    $retrievedState = $this->request->getCurrentRequest()->query->get('state');
+    if (empty($retrievedState) || ($retrievedState !== $state)) {
       $this->userManager->setSessionKeysToNullify(['oauth2state']);
       drupal_set_message($this->t('Google login failed. Unvalid oAuth2 State.'), 'error');
       return $this->redirect('user.login');
@@ -191,14 +189,35 @@ class GoogleAuthController extends ControllerBase {
       return $this->redirect('user.login');
     }
 
+    // Store the data mapped with data points define is
+    // social_auth_google settings.
     $data = [];
 
     $data_points = explode(',', $this->getDataPoints());
 
+    // Iterate thru data points define in settings and try to retrieve them.
     foreach ($data_points as $data_point) {
       switch ($data_point) {
-        default: $this->loggerFactory->get($this->userManager->getPluginId())->error(
-          'Failed to fetch Data Point. Invalid Data Point: @$data_point', ['@$data_point' => $data_point]);
+        case 'id': $data[$data_point] = $google_profile->getId();
+          break;
+
+        case 'name': $data[$data_point] = $google_profile->getName();
+          break;
+
+        case 'email': $data[$data_point] = $google_profile->getEmail();
+          break;
+
+        case 'avatar': $data[$data_point] = $google_profile->getAvatar();
+          break;
+
+        default:
+          if ($google_profile->toArray[$data_point]) {
+            $data[$data_point] = $google_profile->toArray[$data_point];
+          }
+          else {
+            $this->loggerFactory->get($this->userManager->getPluginId())->error(
+              'Failed to fetch Data Point. Invalid Data Point: @$data_point', ['@$data_point' => $data_point]);
+          }
       }
     }
 

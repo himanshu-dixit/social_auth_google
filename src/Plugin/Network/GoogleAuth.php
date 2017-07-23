@@ -11,6 +11,7 @@ use Drupal\social_api\SocialApiException;
 use Drupal\social_auth_google\Settings\GoogleAuthSettings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use League\OAuth2\Client\Provider\Google;
+use Drupal\Core\Site\Settings;
 
 /**
  * Defines a Network Plugin for Social Auth Google.
@@ -109,10 +110,8 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
     }
     /* @var \Drupal\social_auth_google\Settings\GoogleAuthSettings $settings */
     $settings = $this->settings;
-    //check for proxy if it exist, pass ad league setting parameter.
-    if ($proxyPass) {
-      $proxyUrl = 'http://' . $proxyUser . ':' . $proxyPass . '@' . $proxyAddress . ':' . $proxyPort;
-    }
+    // Proxy configuration data for outward proxy.
+    $proxyUrl =  Settings::get("http_client_config")["proxy"]["http"];
     if ($this->validateConfig($settings)) {
       // All these settings are mandatory.
       $league_settings = [
