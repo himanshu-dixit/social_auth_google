@@ -95,9 +95,6 @@ class GoogleAuthController extends ControllerBase {
     // Sets the plugin id.
     $this->userManager->setPluginId('social_auth_google');
 
-    // Sets session prefix for data handler.
-    $this->dataHandler->getSessionPrefix('social_auth_google');
-
     // Sets the session keys to nullify if user could not logged in.
     $this->userManager->setSessionKeysToNullify(['access_token']);
     $this->setting = $this->config('social_auth_google.settings');
@@ -118,7 +115,7 @@ class GoogleAuthController extends ControllerBase {
   }
 
   /**
-   * Response for path 'user/simple-google-connect'.
+   * Response for path 'user/login/google'.
    *
    * Redirects the user to Google for authentication.
    */
@@ -144,7 +141,7 @@ class GoogleAuthController extends ControllerBase {
 
     $state = $this->googleManager->getState();
 
-    $this->dataHandler->set('oAuth2State', $state);
+    $this->dataHandler->set('OAuth2State', $state);
 
     return new TrustedRedirectResponse($google_login_url);
   }
@@ -171,7 +168,7 @@ class GoogleAuthController extends ControllerBase {
       return $this->redirect('user.login');
     }
 
-    $state = $this->dataHandler->get('oAuth2State');
+    $state = $this->dataHandler->get('OAuth2State');
 
     // Retreives $_GET['state'].
     $retrievedState = $this->request->getCurrentRequest()->query->get('state');
@@ -180,6 +177,9 @@ class GoogleAuthController extends ControllerBase {
       drupal_set_message($this->t('Google login failed. Unvalid oAuth2 State.'), 'error');
       return $this->redirect('user.login');
     }
+
+    // Saves access token to session.
+    $this->dataHandler->set('access_token', $this->googleManager->getAccessToken());
 
     $this->googleManager->setClient($google)->authenticate();
 
@@ -195,34 +195,17 @@ class GoogleAuthController extends ControllerBase {
 
     $data_points = explode(',', $this->getDataPoints());
 
-    // Iterate thru data points define in settings and try to retrieve them.
+    // Iterate through data points define in settings and try to retrieve them.
     foreach ($data_points as $data_point) {
-      switch ($data_point) {
-        case 'id': $data[$data_point] = $google_profile->getId();
-          break;
-
-        case 'name': $data[$data_point] = $google_profile->getName();
-          break;
-
-        case 'email': $data[$data_point] = $google_profile->getEmail();
-          break;
-
-        case 'avatar': $data[$data_point] = $google_profile->getAvatar();
-          break;
-
-        default:
-          if ($google_profile->toArray[$data_point]) {
-            $data[$data_point] = $google_profile->toArray[$data_point];
-          }
-          else {
-            $this->loggerFactory->get($this->userManager->getPluginId())->error(
-              'Failed to fetch Data Point. Invalid Data Point: @$data_point', ['@$data_point' => $data_point]);
-          }
+      if ($google_profile->toArray()[$data_point]) {
+        $data[$data_point] = $google_profile->toArray()[$data_point];
       }
-    }
+      else {
+        $this->loggerFactory->get($this->userManager->getPluginId())->error(
+          'Failed to fetch Data Point. Invalid Data Point: @$data_point', ['@$data_point' => $data_point]);
+      }
 
-    // Saves access token to session.
-    $this->dataHandler->set('access_token', $this->googleManager->getAccessToken());
+    }
 
     // If user information could be retrieved.
     return $this->userManager->authenticateUser($google_profile->getName(), $google_profile->getEmail(), 'social_auth_google', $google_profile->getId(), $google_profile->getAvatar(), json_encode($data));

@@ -10,7 +10,7 @@
         "issues": "https://www.drupal.org/project/issues/social_auth_google",
         "source": "http://cgit.drupalcode.org/social_auth_google"
     },
-    "require" : {
+    "require": {
         "league/oauth2-google": "^2.0"
     },
     "authors": [

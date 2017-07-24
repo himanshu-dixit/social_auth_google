@@ -50,6 +50,8 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
 
   protected $requestContext;
 
+  protected $siteSettings;
+
   /**
    * {@inheritdoc}
    */
@@ -62,7 +64,8 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
       $container->get('entity_type.manager'),
       $container->get('config.factory'),
       $container->get('logger.factory'),
-      $container->get('router.request_context')
+      $container->get('router.request_context'),
+      $container->get('settings')
     );
   }
 
@@ -91,13 +94,16 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
                               EntityTypeManagerInterface $entity_type_manager,
                               ConfigFactoryInterface $config_factory,
                               LoggerChannelFactoryInterface $logger_factory,
-                              RequestContext $requestContext) {
+                              RequestContext $requestContext,
+                              Settings $settings
+) {
 
     parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $config_factory);
 
     $this->dataHandler = $data_handler;
     $this->loggerFactory = $logger_factory;
-    $this->requestContext =$requestContext;
+    $this->requestContext = $requestContext;
+    $this->siteSettings = $settings;
   }
 
   /**
@@ -118,7 +124,7 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
     /* @var \Drupal\social_auth_google\Settings\GoogleAuthSettings $settings */
     $settings = $this->settings;
     // Proxy configuration data for outward proxy.
-    $proxyUrl =  Settings::get("http_client_config")["proxy"]["http"];
+    $proxyUrl =   $this->siteSettings->get("http_client_config")["proxy"]["http"];
     if ($this->validateConfig($settings)) {
       // All these settings are mandatory.
       $league_settings = [

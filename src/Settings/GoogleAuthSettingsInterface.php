@@ -3,23 +3,23 @@
 namespace Drupal\social_auth_google\Settings;
 
 /**
- * Defines the settings interface.
+ * Defines an interface for Social Auth Google settings.
  */
 interface GoogleAuthSettingsInterface {
 
   /**
-   * Gets the application ID.
+   * Gets the client ID.
    *
    * @return mixed
-   *   The application ID.
+   *   The client ID.
    */
   public function getClientId();
 
   /**
-   * Gets the application secret.
+   * Gets the client secret.
    *
    * @return string
-   *   The application secret.
+   *   The client secret.
    */
   public function getClientSecret();
 

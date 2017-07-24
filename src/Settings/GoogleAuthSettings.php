@@ -5,38 +5,23 @@ namespace Drupal\social_auth_google\Settings;
 use Drupal\social_api\Settings\SettingsBase;
 
 /**
- * Defines methods to get Social Auth Instagram settings.
+ * Defines methods to get Social Auth Google settings.
  */
 class GoogleAuthSettings extends SettingsBase implements GoogleAuthSettingsInterface {
 
   /**
-   * Application ID.
+   * Client ID.
    *
    * @var string
    */
   protected $clientId;
 
   /**
-   * Application secret.
+   * Client secret.
    *
    * @var string
    */
   protected $clientSecret;
-
-
-  /**
-   * The default access token.
-   *
-   * @var string
-   */
-  protected $defaultToken;
-
-  /**
-   * The redirect URL for social_auth implmeneter.
-   *
-   * @var string
-   */
-  protected $oauthRedirectUrl;
 
   /**
    * {@inheritdoc}
