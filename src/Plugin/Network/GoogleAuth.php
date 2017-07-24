@@ -5,11 +5,13 @@ namespace Drupal\social_auth_google\Plugin\Network;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\Core\Routing\RequestContext;
 use Drupal\social_auth\SocialAuthDataHandler;
 use Drupal\social_api\Plugin\NetworkBase;
 use Drupal\social_api\SocialApiException;
 use Drupal\social_auth_google\Settings\GoogleAuthSettings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use League\OAuth2\Client\Provider\Google;
 use Drupal\Core\Site\Settings;
 
@@ -46,6 +48,8 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
    */
   protected $loggerFactory;
 
+  protected $requestContext;
+
   /**
    * {@inheritdoc}
    */
@@ -57,7 +61,8 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
       $plugin_definition,
       $container->get('entity_type.manager'),
       $container->get('config.factory'),
-      $container->get('logger.factory')
+      $container->get('logger.factory'),
+      $container->get('router.request_context')
     );
   }
 
@@ -85,12 +90,14 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
                               array $plugin_definition,
                               EntityTypeManagerInterface $entity_type_manager,
                               ConfigFactoryInterface $config_factory,
-                              LoggerChannelFactoryInterface $logger_factory) {
+                              LoggerChannelFactoryInterface $logger_factory,
+                              RequestContext $requestContext) {
 
     parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $config_factory);
 
     $this->dataHandler = $data_handler;
     $this->loggerFactory = $logger_factory;
+    $this->requestContext =$requestContext;
   }
 
   /**
@@ -117,9 +124,10 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
       $league_settings = [
         'clientId'          => $settings->getClientId(),
         'clientSecret'      => $settings->getClientSecret(),
-        'redirectUri'       => $GLOBALS['base_url'] . '/user/login/google/callback',
+        'redirectUri'       => $this->requestContext->getCompleteBaseUrl() . '/user/login/google/callback',
         'accessType'        => 'offline',
         'verify'            => false,
+        'proxy'             => $proxyUrl,
       ];
 
       return new Google($league_settings);
