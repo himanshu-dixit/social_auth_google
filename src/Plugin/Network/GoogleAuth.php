@@ -11,7 +11,6 @@ use Drupal\social_api\Plugin\NetworkBase;
 use Drupal\social_api\SocialApiException;
 use Drupal\social_auth_google\Settings\GoogleAuthSettings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use League\OAuth2\Client\Provider\Google;
 use Drupal\Core\Site\Settings;
 
@@ -48,8 +47,18 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
    */
   protected $loggerFactory;
 
+  /**
+   * The request context object.
+   *
+   * @var \Drupal\Core\Routing\RequestContext
+   */
   protected $requestContext;
 
+  /**
+   * The site settings.
+   *
+   * @var \Drupal\Core\Site\Settings
+   */
   protected $siteSettings;
 
   /**
@@ -86,6 +95,10 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
    *   The configuration factory object.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    *   The logger factory.
+   * @param \Drupal\Core\Routing\RequestContext $requestContext
+   *   The Request Context Object.
+   * @param \Drupal\Core\Site\Settings $settings
+   *   The settings factory.
    */
   public function __construct(SocialAuthDataHandler $data_handler,
                               array $configuration,
@@ -96,7 +109,7 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
                               LoggerChannelFactoryInterface $logger_factory,
                               RequestContext $requestContext,
                               Settings $settings
-) {
+  ) {
 
     parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $config_factory);
 
@@ -124,7 +137,7 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
     /* @var \Drupal\social_auth_google\Settings\GoogleAuthSettings $settings */
     $settings = $this->settings;
     // Proxy configuration data for outward proxy.
-    $proxyUrl =   $this->siteSettings->get("http_client_config")["proxy"]["http"];
+    $proxyUrl = $this->siteSettings->get("http_client_config")["proxy"]["http"];
     if ($this->validateConfig($settings)) {
       // All these settings are mandatory.
       $league_settings = [
@@ -132,7 +145,7 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
         'clientSecret'      => $settings->getClientSecret(),
         'redirectUri'       => $this->requestContext->getCompleteBaseUrl() . '/user/login/google/callback',
         'accessType'        => 'offline',
-        'verify'            => false,
+        'verify'            => FALSE,
         'proxy'             => $proxyUrl,
       ];
 

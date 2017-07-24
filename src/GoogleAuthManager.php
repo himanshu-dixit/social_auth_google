@@ -50,14 +50,14 @@ class GoogleAuthManager extends OAuth2Manager {
   /**
    * The Google access token.
    *
-   * @var \League\OAuth2\Client\Provider\Google
+   * @var League\OAuth2\Client\Token\AccessToken
    */
   protected $token;
 
   /**
-   * The Google access token.
+   * The Google user.
    *
-   * @var \League\OAuth2\Client\Provider\Google
+   * @var \League\OAuth2\Client\Provider\GoogleUser
    */
   protected $user;
 
@@ -120,6 +120,9 @@ class GoogleAuthManager extends OAuth2Manager {
 
   /**
    * Returns scopes required for data point defined by administator.
+   *
+   * @param array $data_points
+   *   The data points to be collected.
    *
    * @return array
    *   scopes for authorization URL.
