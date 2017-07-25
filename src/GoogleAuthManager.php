@@ -122,7 +122,7 @@ class GoogleAuthManager extends OAuth2Manager {
   public function getExtraDetails($url) {
     $httpRequest = $this->client->getAuthenticatedRequest('GET', $url, $this->token, []);
     $data = $this->client->getResponse($httpRequest);
-    return $data;
+    return json_decode($data->getBody(), true);
   }
 
   /**
