@@ -89,7 +89,7 @@ class GoogleAuthManager extends OAuth2Manager {
    * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
    *   Used for generating absoulute URLs.
    * @param \Drupal\Core\Config\ConfigFactory $configFactory
-   *   Used for config factory.
+   *   Used for accessing configuration object factory.
    */
   public function __construct(LoggerChannelFactoryInterface $logger_factory, EventDispatcherInterface $event_dispatcher, EntityFieldManagerInterface $entity_field_manager, UrlGeneratorInterface $url_generator, ConfigFactory $configFactory) {
     $this->loggerFactory      = $logger_factory;
