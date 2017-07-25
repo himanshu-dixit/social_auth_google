@@ -89,7 +89,7 @@ class GoogleAuthController extends ControllerBase {
     $this->userManager->setPluginId('social_auth_google');
 
     // Sets the session keys to nullify if user could not logged in.
-    $this->userManager->setSessionKeysToNullify(['access_token']);
+    $this->userManager->setSessionKeysToNullify(['access_token', 'oauth2state']);
     $this->setting = $this->config('social_auth_google.settings');
   }
 
@@ -132,7 +132,7 @@ class GoogleAuthController extends ControllerBase {
 
     $state = $this->googleManager->getState();
 
-    $this->dataHandler->set('OAuth2State', $state);
+    $this->dataHandler->set('oauth2state', $state);
 
     return new TrustedRedirectResponse($google_login_url);
   }
@@ -159,12 +159,12 @@ class GoogleAuthController extends ControllerBase {
       return $this->redirect('user.login');
     }
 
-    $state = $this->dataHandler->get('OAuth2State');
+    $state = $this->dataHandler->get('oauth2state');
 
     // Retreives $_GET['state'].
     $retrievedState = $this->request->getCurrentRequest()->query->get('state');
     if (empty($retrievedState) || ($retrievedState !== $state)) {
-      $this->userManager->setSessionKeysToNullify(['oauth2state']);
+      $this->userManager->nullifySessionKeys();
       drupal_set_message($this->t('Google login failed. Unvalid oAuth2 State.'), 'error');
       return $this->redirect('user.login');
     }

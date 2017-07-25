@@ -70,6 +70,14 @@ class GoogleAuthManager extends OAuth2Manager {
   protected $scopes;
 
   /**
+   * Social Auth Google Settings.
+   *
+   * @var array
+   */
+  protected $settings;
+
+
+  /**
    * Constructor.
    *
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
@@ -80,13 +88,15 @@ class GoogleAuthManager extends OAuth2Manager {
    *   Used for accessing Drupal user picture preferences.
    * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
    *   Used for generating absoulute URLs.
+   * @param \Drupal\Core\Config\ConfigFactory $configFactory
+   *   Used for config factory.
    */
   public function __construct(LoggerChannelFactoryInterface $logger_factory, EventDispatcherInterface $event_dispatcher, EntityFieldManagerInterface $entity_field_manager, UrlGeneratorInterface $url_generator, ConfigFactory $configFactory) {
     $this->loggerFactory      = $logger_factory;
     $this->eventDispatcher    = $event_dispatcher;
     $this->entityFieldManager = $entity_field_manager;
     $this->urlGenerator       = $url_generator;
-    $this->setting            = $configFactory->getEditable('social_auth_google.settings');
+    $this->config             = $configFactory->getEditable('social_auth_google.settings');
   }
 
   /**
@@ -98,14 +108,12 @@ class GoogleAuthManager extends OAuth2Manager {
   public function authenticate() {
     $this->token = $this->client->getAccessToken('authorization_code',
       ['code' => $_GET['code']]);
-
-    return $this->token;
   }
 
   /**
    * Gets the data by using the access token returned.
    *
-   * @return array
+   * @return League\OAuth2\Client\Provider\GoogleUser
    *   User info returned by the Google.
    */
   public function getUserInfo() {
@@ -172,7 +180,7 @@ class GoogleAuthManager extends OAuth2Manager {
    */
   public function getScopes() {
     if (!$this->scopes) {
-      $this->scopes = $this->setting->get('scopes');
+      $this->scopes = $this->config->get('scopes');
     }
     return $this->scopes;
   }
@@ -184,7 +192,7 @@ class GoogleAuthManager extends OAuth2Manager {
    *   API calls separtated by comma.
    */
   public function getAPICalls() {
-    return $this->setting->get('api_calls');
+    return $this->config->get('api_calls');
   }
 
 }

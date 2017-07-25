@@ -150,7 +150,7 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
           'proxy' => $proxyUrl,
         ];
       }
-      else{
+      else {
         $league_settings = [
           'clientId' => $settings->getClientId(),
           'clientSecret' => $settings->getClientSecret(),
@@ -163,13 +163,6 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
       return new Google($league_settings);
     }
     return FALSE;
-  }
-
-  /**
-   *
-   */
-  protected function retrieveData() {
-
   }
 
   /**

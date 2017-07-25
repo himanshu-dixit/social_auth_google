@@ -119,7 +119,7 @@ class GoogleAuthSettingsForm extends SocialAuthSettingsForm {
       '#type' => 'textarea',
       '#title' => $this->t('Scopes for API call'),
       '#default_value' => $config->get('scopes'),
-      '#description' => $this->t('Define the requested scopes to make API calls furhter.'),
+      '#description' => $this->t('Define the requested scopes to make API calls.'),
     ];
 
     $form['google_settings']['api_calls'] = [
