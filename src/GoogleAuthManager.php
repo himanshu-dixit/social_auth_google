@@ -116,8 +116,8 @@ class GoogleAuthManager extends OAuth2Manager {
   /**
    * Gets the data by using the access token returned.
    *
-   * @return \League\OAuth2\Client\Provider\GoogleUser
-   *   User info returned by the Google.
+   * @return string
+   *   Data returned by Making API Call.
    */
   public function getExtraDetails($url) {
     $httpRequest = $this->client->getAuthenticatedRequest('GET', $url, $this->token, []);
@@ -137,6 +137,7 @@ class GoogleAuthManager extends OAuth2Manager {
       'openid',
       'profile',
     ];
+
     $google_scopes = explode(',', $this->getScopes());
     foreach ($google_scopes as $scope) {
       array_push($scopes, $scope);

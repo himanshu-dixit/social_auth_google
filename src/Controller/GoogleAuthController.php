@@ -185,10 +185,8 @@ class GoogleAuthController extends ControllerBase {
     $data = [];
 
     $api_calls = explode(',', $this->googleManager->getAPICalls());
-    // var_dump($google_profile);
-    var_dump($google_profile);
 
-    // Iterate through api calls definee in settings and try to retrieve them.
+    // Iterate through api calls define in settings and try to retrieve them.
     foreach ($api_calls as $api_call) {
       $call = $this->googleManager->getExtraDetails($api_call);
       array_push($data, $call);
