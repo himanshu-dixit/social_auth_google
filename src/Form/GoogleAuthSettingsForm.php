@@ -99,11 +99,18 @@ class GoogleAuthSettingsForm extends SocialAuthSettingsForm {
       '#description' => $this->t('Copy the Client Secret here.'),
     ];
 
-    $form['google_settings']['data_points'] = [
+    $form['google_settings']['scopes'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Data Points to be Collected'),
-      '#default_value' => 'name,email',
-      '#description' => $this->t('Define the data point to be stored in database, data points must be separated by comma.'),
+      '#title' => $this->t('Scopes for API call'),
+      '#default_value' => $config->get('scopes'),
+      '#description' => $this->t('Define the requested scopes.'),
+    ];
+
+    $form['google_settings']['api_calls'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('API calls to be made to collect data'),
+      '#default_value' => $config->get('api_calls'),
+      '#description' => $this->t('Define the API calls which will be called to get data.'),
     ];
 
     $form['google_settings']['authorized_redirect_url'] = [
@@ -133,7 +140,8 @@ class GoogleAuthSettingsForm extends SocialAuthSettingsForm {
     $this->config('social_auth_google.settings')
       ->set('client_id', $values['client_id'])
       ->set('client_secret', $values['client_secret'])
-      ->set('data_points', $values['data_points'])
+      ->set('scopes', $values['scopes'])
+      ->set('api_calls', $values['api_calls'])
       ->save();
 
     parent::submitForm($form, $form_state);

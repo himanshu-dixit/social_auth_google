@@ -3,6 +3,7 @@
 namespace Drupal\social_auth_google;
 
 use Drupal\social_auth\AuthManager\OAuth2Manager;
+use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
@@ -50,7 +51,7 @@ class GoogleAuthManager extends OAuth2Manager {
   /**
    * The Google access token.
    *
-   * @var League\OAuth2\Client\Token\AccessToken
+   * @var \League\OAuth2\Client\Token\AccessToken
    */
   protected $token;
 
@@ -60,6 +61,13 @@ class GoogleAuthManager extends OAuth2Manager {
    * @var \League\OAuth2\Client\Provider\GoogleUser
    */
   protected $user;
+
+  /**
+   * The data point to be collected.
+   *
+   * @var string
+   */
+  protected $scopes;
 
   /**
    * Constructor.
@@ -73,11 +81,12 @@ class GoogleAuthManager extends OAuth2Manager {
    * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
    *   Used for generating absoulute URLs.
    */
-  public function __construct(LoggerChannelFactoryInterface $logger_factory, EventDispatcherInterface $event_dispatcher, EntityFieldManagerInterface $entity_field_manager, UrlGeneratorInterface $url_generator) {
+  public function __construct(LoggerChannelFactoryInterface $logger_factory, EventDispatcherInterface $event_dispatcher, EntityFieldManagerInterface $entity_field_manager, UrlGeneratorInterface $url_generator, ConfigFactory $configFactory) {
     $this->loggerFactory      = $logger_factory;
     $this->eventDispatcher    = $event_dispatcher;
     $this->entityFieldManager = $entity_field_manager;
     $this->urlGenerator       = $url_generator;
+    $this->setting            = $configFactory->getEditable('social_auth_google.settings');
   }
 
   /**
@@ -105,46 +114,40 @@ class GoogleAuthManager extends OAuth2Manager {
   }
 
   /**
+   * Gets the data by using the access token returned.
+   *
+   * @return \League\OAuth2\Client\Provider\GoogleUser
+   *   User info returned by the Google.
+   */
+  public function getExtraDetails($url) {
+    $httpRequest = $this->client->getAuthenticatedRequest('GET', $url, $this->token, []);
+    $data = $this->client->getResponse($httpRequest);
+    return $data;
+  }
+
+  /**
    * Returns the Google login URL where user will be redirected.
    *
    * @return string
    *   Absolute Google login URL where user will be redirected
    */
-  public function getGoogleLoginUrl($data_points) {
-    $scopes = $this->checkForScopes($data_points);
-    $login_url = $this->client->getAuthorizationUrl($scopes);
+  public function getGoogleLoginUrl() {
+    $scopes = [
+      'email',
+      'openid',
+      'profile',
+    ];
+    $google_scopes = explode(',', $this->getScopes());
+    foreach ($google_scopes as $scope) {
+      array_push($scopes, $scope);
+    }
+
+    $login_url = $this->client->getAuthorizationUrl([
+      'scope' => $scopes,
+    ]);
 
     // Generate and return the URL where we should redirect the user.
     return $login_url;
-  }
-
-  /**
-   * Returns scopes required for data point defined by administator.
-   *
-   * @param array $data_points
-   *   The data points to be collected.
-   *
-   * @return array
-   *   scopes for authorization URL.
-   */
-  protected function checkForScopes($data_points) {
-    $scopes = [];
-
-    // Scopes required for data point.
-    $scopeForDataPoint = [
-      "name"   => '',
-      "email"  => '',
-    ];
-
-    foreach ($data_points as $data_point) {
-      $scope = $scopeForDataPoint[$data_point];
-      // If scope is not in array, then add it.
-      if (!in_array($scope, $scopes)) {
-        array_push($scopes, $scope);
-      }
-    }
-
-    return $scopes;
   }
 
   /**
@@ -161,35 +164,26 @@ class GoogleAuthManager extends OAuth2Manager {
   }
 
   /**
-   * Determines preferred profile pic resolution from account settings.
+   * Gets the data Point defined the settings form page.
    *
-   * Return order: max resolution, min resolution, FALSE.
-   *
-   * @return array|false
-   *   Array of resolution, if defined in Drupal account settings
-   *   False otherwise
+   * @return string
+   *   Data points separtated by comma.
    */
-  protected function getPreferredResolution() {
-    $field_definitions = $this->entityFieldManager->getFieldDefinitions('user', 'user');
-    if (!isset($field_definitions['user_picture'])) {
-      return FALSE;
+  public function getScopes() {
+    if (!$this->scopes) {
+      $this->scopes = $this->setting->get('scopes');
     }
+    return $this->scopes;
+  }
 
-    $max_resolution = $field_definitions['user_picture']->getSetting('max_resolution');
-    $min_resolution = $field_definitions['user_picture']->getSetting('min_resolution');
-
-    // Return order: max resolution, min resolution, FALSE.
-    if ($max_resolution) {
-      $resolution = $max_resolution;
-    }
-    elseif ($min_resolution) {
-      $resolution = $min_resolution;
-    }
-    else {
-      return FALSE;
-    }
-    $dimensions = explode('x', $resolution);
-    return ['width' => $dimensions[0], 'height' => $dimensions[1]];
+  /**
+   * Gets the API calls to collect data.
+   *
+   * @return string
+   *   API calls separtated by comma.
+   */
+  public function getAPICalls() {
+    return $this->setting->get('api_calls');
   }
 
 }

@@ -140,18 +140,36 @@ class GoogleAuth extends NetworkBase implements GoogleAuthInterface {
     $proxyUrl = $this->siteSettings->get("http_client_config")["proxy"]["http"];
     if ($this->validateConfig($settings)) {
       // All these settings are mandatory.
-      $league_settings = [
-        'clientId'          => $settings->getClientId(),
-        'clientSecret'      => $settings->getClientSecret(),
-        'redirectUri'       => $this->requestContext->getCompleteBaseUrl() . '/user/login/google/callback',
-        'accessType'        => 'offline',
-        'verify'            => FALSE,
-        'proxy'             => $proxyUrl,
-      ];
+      if ($proxyUrl) {
+        $league_settings = [
+          'clientId' => $settings->getClientId(),
+          'clientSecret' => $settings->getClientSecret(),
+          'redirectUri' => $this->requestContext->getCompleteBaseUrl() . '/user/login/google/callback',
+          'accessType' => 'offline',
+          'verify' => FALSE,
+          'proxy' => $proxyUrl,
+        ];
+      }
+      else{
+        $league_settings = [
+          'clientId' => $settings->getClientId(),
+          'clientSecret' => $settings->getClientSecret(),
+          'redirectUri' => $this->requestContext->getCompleteBaseUrl() . '/user/login/google/callback',
+          'accessType' => 'offline',
+          'verify' => FALSE,
+        ];
+      }
 
       return new Google($league_settings);
     }
     return FALSE;
+  }
+
+  /**
+   *
+   */
+  protected function retrieveData() {
+
   }
 
   /**

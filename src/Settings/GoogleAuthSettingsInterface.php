@@ -10,7 +10,7 @@ interface GoogleAuthSettingsInterface {
   /**
    * Gets the client ID.
    *
-   * @return mixed
+   * @return string
    *   The client ID.
    */
   public function getClientId();

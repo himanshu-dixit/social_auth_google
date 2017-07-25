@@ -52,12 +52,6 @@ class GoogleAuthController extends ControllerBase {
    */
   private $dataHandler;
 
-  /**
-   * The data point to be collected.
-   *
-   * @var string
-   */
-  private $dataPoints;
 
   /**
    * The logger channel.
@@ -131,12 +125,10 @@ class GoogleAuthController extends ControllerBase {
     // Google service was returned, inject it to $googleManager.
     $this->googleManager->setClient($google);
 
-    $data_points = explode(',', $this->getDataPoints());
-
     // Generates the URL where the user will be redirected for Google login.
     // If the user did not have email permission granted on previous attempt,
     // we use the re-request URL requesting only the email address.
-    $google_login_url = $this->googleManager->getGoogleLoginUrl($data_points);
+    $google_login_url = $this->googleManager->getGoogleLoginUrl();
 
     $state = $this->googleManager->getState();
 
@@ -192,35 +184,18 @@ class GoogleAuthController extends ControllerBase {
     // social_auth_google settings.
     $data = [];
 
-    $data_points = explode(',', $this->getDataPoints());
+    $api_calls = explode(',', $this->googleManager->getAPICalls());
+    // var_dump($google_profile);
+    var_dump($google_profile);
 
-    // Iterate through data points define in settings and try to retrieve them.
-    foreach ($data_points as $data_point) {
-      if ($google_profile->toArray()[$data_point]) {
-        $data[$data_point] = $google_profile->toArray()[$data_point];
-      }
-      else {
-        $this->loggerFactory->get($this->userManager->getPluginId())->error(
-          'Failed to fetch Data Point. Invalid Data Point: @$data_point', ['@$data_point' => $data_point]);
-      }
-
+    // Iterate through api calls definee in settings and try to retrieve them.
+    foreach ($api_calls as $api_call) {
+      $call = $this->googleManager->getExtraDetails($api_call);
+      array_push($data, $call);
     }
 
     // If user information could be retrieved.
     return $this->userManager->authenticateUser($google_profile->getName(), $google_profile->getEmail(), 'social_auth_google', $google_profile->getId(), $google_profile->getAvatar(), json_encode($data));
-  }
-
-  /**
-   * Gets the data Point defined the settings form page.
-   *
-   * @return string
-   *   Data points separtated by comma.
-   */
-  public function getDataPoints() {
-    if (!$this->dataPoints) {
-      $this->dataPoints = $this->config('social_auth_google.settings')->get('data_points');
-    }
-    return $this->dataPoints;
   }
 
 }
