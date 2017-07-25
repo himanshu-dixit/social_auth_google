@@ -99,20 +99,6 @@ class GoogleAuthSettingsForm extends SocialAuthSettingsForm {
       '#description' => $this->t('Copy the Client Secret here.'),
     ];
 
-    $form['google_settings']['scopes'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Scopes for API call'),
-      '#default_value' => $config->get('scopes'),
-      '#description' => $this->t('Define the requested scopes.'),
-    ];
-
-    $form['google_settings']['api_calls'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('API calls to be made to collect data'),
-      '#default_value' => $config->get('api_calls'),
-      '#description' => $this->t('Define the API calls which will be called to get data.'),
-    ];
-
     $form['google_settings']['authorized_redirect_url'] = [
       '#type' => 'textfield',
       '#disabled' => TRUE,
@@ -127,6 +113,20 @@ class GoogleAuthSettingsForm extends SocialAuthSettingsForm {
       '#title' => $this->t('Authorized Javascript Origin'),
       '#description' => $this->t('Copy this value to <em>Authorized Javascript Origins</em> field of your Google App settings.'),
       '#default_value' => $this->requestContext->getHost(),
+    ];
+
+    $form['google_settings']['scopes'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Scopes for API call'),
+      '#default_value' => $config->get('scopes'),
+      '#description' => $this->t('Define the requested scopes to make API calls furhter.'),
+    ];
+
+    $form['google_settings']['api_calls'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('API calls to be made to collect data'),
+      '#default_value' => $config->get('api_calls'),
+      '#description' => $this->t('Define the API calls which will retrieve data from provider.'),
     ];
 
     return parent::buildForm($form, $form_state);
