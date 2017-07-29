@@ -161,7 +161,7 @@ class GoogleAuthController extends ControllerBase {
 
     $state = $this->dataHandler->get('oauth2state');
 
-    // Retreives $_GET['state'].
+    // Retrieves $_GET['state'].
     $retrievedState = $this->request->getCurrentRequest()->query->get('state');
     if (empty($retrievedState) || ($retrievedState !== $state)) {
       $this->userManager->nullifySessionKeys();
@@ -184,15 +184,16 @@ class GoogleAuthController extends ControllerBase {
     // social_auth_google settings.
     $data = [];
 
-    $api_calls = explode(PHP_EOL, $this->googleManager->getAPICalls());
+    if (!$this->userManager->checkIfUserExists()) {
+      $api_calls = explode(PHP_EOL, $this->googleManager->getAPICalls());
 
-    // Iterate through api calls define in settings and try to retrieve them.
-    foreach ($api_calls as $api_call) {
+      // Iterate through api calls define in settings and try to retrieve them.
+      foreach ($api_calls as $api_call) {
 
-      $call = $this->googleManager->getExtraDetails($api_call);
-      array_push($data, $call);
+        $call = $this->googleManager->getExtraDetails($api_call);
+        array_push($data, $call);
+      }
     }
-
     // If user information could be retrieved.
     return $this->userManager->authenticateUser($google_profile->getName(), $google_profile->getEmail(), 'social_auth_google', $google_profile->getId(), $google_profile->getAvatar(), $this->googleManager->getAccessToken(), json_encode($data));
   }
