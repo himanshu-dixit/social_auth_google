@@ -184,7 +184,7 @@ class GoogleAuthController extends ControllerBase {
     // social_auth_google settings.
     $data = [];
 
-    $api_calls = explode(',', $this->googleManager->getAPICalls());
+    $api_calls = explode(PHP_EOL, $this->googleManager->getAPICalls());
 
     // Iterate through api calls define in settings and try to retrieve them.
     foreach ($api_calls as $api_call) {
@@ -194,7 +194,7 @@ class GoogleAuthController extends ControllerBase {
     }
 
     // If user information could be retrieved.
-    return $this->userManager->authenticateUser($google_profile->getName(), $google_profile->getEmail(), 'social_auth_google', $google_profile->getId(), $google_profile->getAvatar(), json_encode($data));
+    return $this->userManager->authenticateUser($google_profile->getName(), $google_profile->getEmail(), 'social_auth_google', $google_profile->getId(), $google_profile->getAvatar(), $this->googleManager->getAccessToken(), json_encode($data));
   }
 
 }

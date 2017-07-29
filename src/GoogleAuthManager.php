@@ -76,7 +76,6 @@ class GoogleAuthManager extends OAuth2Manager {
    */
   protected $settings;
 
-
   /**
    * Constructor.
    *
@@ -130,14 +129,24 @@ class GoogleAuthManager extends OAuth2Manager {
   public function getExtraDetails($url) {
     $httpRequest = $this->client->getAuthenticatedRequest('GET', $url, $this->token, []);
     $data = $this->client->getResponse($httpRequest);
-    return json_decode($data->getBody(), true);
+    return json_decode($data->getBody(), TRUE);
+  }
+
+  /**
+   * Returns token generated after authorization.
+   *
+   * @return string
+   *   Used for making API calls.
+   */
+  public function getAccessToken() {
+    return $this->token;
   }
 
   /**
    * Returns the Google login URL where user will be redirected.
    *
    * @return string
-   *   Absolute Google login URL where user will be redirected
+   *   Absolute Google login URL where user will be redirected.
    */
   public function getGoogleLoginUrl() {
     $scopes = [
@@ -146,7 +155,7 @@ class GoogleAuthManager extends OAuth2Manager {
       'profile',
     ];
 
-    $google_scopes = explode(',', $this->getScopes());
+    $google_scopes = explode(PHP_EOL, $this->getScopes());
     foreach ($google_scopes as $scope) {
       array_push($scopes, $scope);
     }
