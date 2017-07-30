@@ -63,6 +63,13 @@ class GoogleAuthManager extends OAuth2Manager {
   protected $user;
 
   /**
+   * The config factory object
+   *
+   * @var \Drupal\Core\Config\ConfigFactory
+   */
+  protected $config;
+
+  /**
    * The data point to be collected.
    *
    * @var string
@@ -112,7 +119,7 @@ class GoogleAuthManager extends OAuth2Manager {
   /**
    * Gets the data by using the access token returned.
    *
-   * @return League\OAuth2\Client\Provider\GoogleUser
+   * @return \League\OAuth2\Client\Provider\GoogleUser
    *   User info returned by the Google.
    */
   public function getUserInfo() {
@@ -127,9 +134,11 @@ class GoogleAuthManager extends OAuth2Manager {
    *   Data returned by Making API Call.
    */
   public function getExtraDetails($url) {
-    $httpRequest = $this->client->getAuthenticatedRequest('GET', $url, $this->token, []);
-    $data = $this->client->getResponse($httpRequest);
-    return json_decode($data->getBody(), TRUE);
+    if ($url) {
+      $httpRequest = $this->client->getAuthenticatedRequest('GET', $url, $this->token, []);
+      $data = $this->client->getResponse($httpRequest);
+      return json_decode($data->getBody(), TRUE);
+    }
   }
 
   /**
