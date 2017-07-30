@@ -184,7 +184,7 @@ class GoogleAuthController extends ControllerBase {
     // social_auth_google settings.
     $data = [];
 
-    if (!$this->userManager->checkIfUserExists('social_auth_google', $google_profile->getId())) {
+    if (!$this->userManager->checkIfUserExists( $google_profile->getId())) {
       $api_calls = explode(PHP_EOL, $this->googleManager->getAPICalls());
 
       // Iterate through api calls define in settings and try to retrieve them.
@@ -195,7 +195,7 @@ class GoogleAuthController extends ControllerBase {
       }
     }
     // If user information could be retrieved.
-    return $this->userManager->authenticateUser($google_profile->getName(), $google_profile->getEmail(), 'social_auth_google', $google_profile->getId(), $google_profile->getAvatar(), $this->googleManager->getAccessToken(), json_encode($data));
+    return $this->userManager->authenticateUser($google_profile->getName(), $google_profile->getEmail(), $google_profile->getId(), $google_profile->getAvatar(), $this->googleManager->getAccessToken(), json_encode($data));
   }
 
 }
