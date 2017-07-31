@@ -63,7 +63,7 @@ class GoogleAuthManager extends OAuth2Manager {
   protected $user;
 
   /**
-   * The config factory object
+   * The config factory object.
    *
    * @var \Drupal\Core\Config\ConfigFactory
    */
